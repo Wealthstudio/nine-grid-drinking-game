@@ -9,19 +9,46 @@
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;min-height:100vh;padding:16px;}
   .wrap{max-width:480px;margin:0 auto;}
-  .header{text-align:center;margin-bottom:1rem;}
-  .header h1{font-size:22px;font-weight:700;color:#1a1a1a;}
-  .header p{font-size:12px;color:#888;margin-top:3px;}
-  .pbar{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 8px;margin-bottom:10px;}
-  .pchip{flex-shrink:0;background:#eee;padding:7px 12px;border-radius:999px;font-size:13px;color:#555;display:flex;align-items:center;gap:5px;border:1.5px solid transparent;cursor:pointer;}
-  .pchip.active{background:#D85A30;color:white;font-weight:600;border-color:#993C1D;}
-  .pchip .sips{font-size:11px;opacity:0.85;}
-  .pchip .rx{background:none;border:none;color:inherit;font-size:13px;cursor:pointer;padding:0;margin-left:2px;opacity:0.6;}
-  .add-row{display:flex;gap:6px;margin-bottom:12px;}
+
+  /* SETUP */
+  .setup-screen{max-width:480px;margin:0 auto;padding:1.5rem 1rem;}
+  .setup-screen h1{font-size:24px;font-weight:700;color:#1a1a1a;text-align:center;margin-bottom:4px;}
+  .setup-sub{font-size:12px;color:#888;text-align:center;margin-bottom:1.5rem;}
+  .section-label{font-size:13px;font-weight:600;color:#888;margin-bottom:8px;}
+  .add-row{display:flex;gap:6px;margin-bottom:10px;}
   .add-row input{flex:1;padding:9px 12px;border-radius:10px;border:1px solid #ddd;background:white;font-size:14px;color:#1a1a1a;outline:none;}
   .add-row input:focus{border-color:#D85A30;}
   .add-row button{padding:9px 16px;border-radius:10px;border:1px solid #ddd;background:white;font-size:14px;cursor:pointer;color:#1a1a1a;font-weight:500;}
-  .dinfo{text-align:center;font-size:12px;color:#aaa;margin-bottom:8px;}
+  .player-list{margin-bottom:12px;min-height:36px;}
+  .player-item{display:flex;align-items:center;padding:9px 12px;background:white;border-radius:10px;margin-bottom:6px;border:1px solid #eee;}
+  .player-item .pidx{font-size:12px;color:#bbb;margin-right:8px;min-width:16px;}
+  .player-item .pname{flex:1;font-size:14px;color:#1a1a1a;font-weight:500;}
+  .player-item .del{background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;padding:0 4px;}
+  .player-item .del:hover{color:#E24B4A;}
+  .empty-hint{font-size:13px;color:#ccc;text-align:center;padding:12px;}
+  .need-warn{font-size:12px;color:#E24B4A;text-align:center;margin-bottom:10px;padding:8px;background:#fff0f0;border-radius:8px;}
+  .mode-cards{display:flex;gap:12px;margin-top:4px;}
+  .mode-card{flex:1;border-radius:14px;padding:20px 12px;cursor:pointer;border:2px solid #ddd;background:white;transition:all 0.15s;text-align:center;}
+  .mode-card:not(.disabled):hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.1);}
+  .mode-card.normal:not(.disabled):hover{border-color:#4A90D9;}
+  .mode-card.hell{background:#1a0a0a;border-color:#3a1515;}
+  .mode-card.hell:not(.disabled):hover{border-color:#E24B4A;}
+  .mode-card.disabled{opacity:0.35;cursor:not-allowed;pointer-events:none;}
+  .mode-card .icon{font-size:38px;margin-bottom:8px;}
+  .mode-card .mtitle{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:5px;}
+  .mode-card.hell .mtitle{color:#FF6B6B;}
+  .mode-card .mdesc{font-size:11px;color:#888;line-height:1.6;}
+  .mode-card.hell .mdesc{color:#999;}
+
+  /* GAME */
+  .header{text-align:center;margin-bottom:0.75rem;}
+  .header h1{font-size:22px;font-weight:700;color:#1a1a1a;}
+  .header p{font-size:12px;color:#888;margin-top:3px;}
+  .hell-banner{background:#1a0a0a;border:1px solid #5a1a1a;border-radius:10px;padding:6px 12px;text-align:center;font-size:12px;color:#FF6B6B;font-weight:600;margin-bottom:10px;}
+  .pbar{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;margin-bottom:10px;}
+  .pchip{flex-shrink:0;background:#eee;padding:7px 12px;border-radius:999px;font-size:13px;color:#555;display:flex;align-items:center;gap:5px;border:1.5px solid transparent;cursor:pointer;}
+  .pchip.active{background:#D85A30;color:white;font-weight:600;border-color:#993C1D;}
+  .pchip .sips{font-size:11px;opacity:0.85;}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px;}
   .cell{aspect-ratio:5/7;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;user-select:none;border:1px solid #1a3a5c;background:#0f2744;padding:4px;transition:transform 0.1s,box-shadow 0.1s;}
   .cell:hover:not(.locked){transform:translateY(-2px);border-color:#4A90D9;box-shadow:0 4px 14px rgba(74,144,217,0.3);}
@@ -29,6 +56,7 @@
   .cell.locked{cursor:not-allowed;opacity:0.4;}
   .cell.is-bomb{background:#E24B4A;border-color:#A32D2D;}
   .cell.is-bomb.selected{border:2.5px solid #501313;}
+  .cell.bingo-hit{border:2.5px solid #FFD700!important;box-shadow:0 0 18px rgba(255,215,0,0.7)!important;}
   .rank{font-size:28px;font-weight:700;line-height:1;}
   .suit{font-size:24px;margin-top:2px;}
   .bomb-icon{font-size:38px;}
@@ -49,6 +77,7 @@
   .banner.lose{background:#ffebee;color:#c62828;}
   .banner.bomb-lose{background:#E24B4A;color:white;}
   .banner.dragon{background:#7B2FBE;color:white;}
+  .banner.bingo{background:#1a0a0a;border:1px solid #FFD700;color:#FFD700;font-size:15px;}
   .cbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
   .cbtns .btn{padding:10px 22px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid #ddd;background:#f9f9f9;color:#1a1a1a;}
   .cbtns .primary{background:#D85A30;color:white;border-color:#D85A30;}
@@ -67,28 +96,58 @@
   .hint{font-size:12px;color:#bbb;text-align:center;line-height:1.6;margin-top:8px;padding:8px;background:white;border-radius:10px;border:1px solid #eee;}
   .hint .bl{color:#E24B4A;}
   .hint .dragon{color:#9B6FD4;}
-  .qr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:100;align-items:center;justify-content:center;}
+  .hint .bingo{color:#DAA520;}
+  /* QR */
+  .qr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;}
   .qr-overlay.show{display:flex;}
-  .qr-box{background:white;border-radius:20px;padding:28px 24px;max-width:300px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.25);}
+  .qr-box{background:white;border-radius:20px;padding:28px 24px;max-width:300px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
   .qr-box h2{font-size:17px;font-weight:700;color:#1a1a1a;margin-bottom:4px;}
   .qr-box p{font-size:12px;color:#888;margin-bottom:16px;line-height:1.5;}
-  #qr-canvas{display:flex;justify-content:center;margin-bottom:16px;}
+  #qr-canvas{display:flex;justify-content:center;margin-bottom:14px;}
   .qr-url{font-size:11px;color:#aaa;word-break:break-all;background:#f5f5f5;padding:8px 10px;border-radius:8px;margin-bottom:16px;}
   .qr-close{padding:10px 28px;border-radius:10px;border:none;background:#D85A30;color:white;font-size:14px;font-weight:700;cursor:pointer;}
 </style>
 </head>
 <body>
-<div class="wrap">
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen" class="setup-screen">
+  <h1>🎴 九宫格喝酒</h1>
+  <div class="setup-sub">先加玩家，再选模式开始游戏</div>
+
+  <div class="section-label">👥 玩家（至少 2 人）</div>
+  <div class="add-row">
+    <input id="setup-np" type="text" placeholder="输入玩家名字" maxlength="10" onkeydown="if(event.key==='Enter')setupAddPlayer()"/>
+    <button onclick="setupAddPlayer()">+ 添加</button>
+  </div>
+  <div class="player-list" id="setup-player-list">
+    <div class="empty-hint">还没有玩家，快来添加！</div>
+  </div>
+  <div class="need-warn" id="need-warn" style="display:none;">⚠️ 请至少添加 2 名玩家才能开始</div>
+
+  <div class="section-label" style="margin-top:16px;">🎮 选择模式</div>
+  <div class="mode-cards">
+    <div class="mode-card normal disabled" id="btn-normal" onclick="startGame('normal')">
+      <div class="icon">🍺</div>
+      <div class="mtitle">普通玩法</div>
+      <div class="mdesc">猜大小<br>炸弹双倍<br>龙门框双倍</div>
+    </div>
+    <div class="mode-card hell disabled" id="btn-hell" onclick="startGame('hell')">
+      <div class="icon">🔥</div>
+      <div class="mtitle">地狱玩法</div>
+      <div class="mdesc">普通规则全包含<br><br>三格同号连线<br>= BINGO 全喝</div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen" class="wrap" style="display:none;">
   <div class="header">
     <h1>🎴 九宫格喝酒</h1>
-    <p>猜错不换人 · 炸弹双倍 · 中龙门框双倍 · 53张牌</p>
+    <p id="mode-label"></p>
   </div>
+  <div id="hell-banner" class="hell-banner" style="display:none;">🔥 地狱模式 · 三格同号连线 = BINGO！全线叠牌数合并喝</div>
   <div class="pbar" id="pbar"></div>
-  <div class="add-row">
-    <input id="np" type="text" placeholder="输入玩家名字" maxlength="10" onkeydown="if(event.key==='Enter')addPlayer()"/>
-    <button onclick="addPlayer()">+ 添加</button>
-  </div>
-  <div class="dinfo" id="dinfo">剩余牌数: 53</div>
   <div class="grid" id="grid"></div>
   <div class="panel" id="panel"></div>
   <div class="lb-wrap">
@@ -97,12 +156,14 @@
   </div>
   <div class="footer-btns">
     <button class="btn" onclick="resetBoard()">🔀 重新发牌</button>
-    <button class="btn" onclick="resetSips()">清零排行榜</button>
-    <button class="btn" onclick="showQR()" style="background:#D85A30;color:white;border-color:#D85A30;">📲 扫码分享</button>
+    <button class="btn" onclick="resetSips()">清零</button>
+    <button class="btn" onclick="showQR()" style="background:#D85A30;color:white;border-color:#D85A30;">📲 扫码</button>
+    <button class="btn" onclick="backToSetup()">← 重新设置</button>
   </div>
-  <div class="hint">A=1最小 · K=13最大 · <span class="dragon">同号=中龙门框×2</span> · 猜错继续 · <span class="bl">💣炸弹×2</span>（可叠加）</div>
+  <div class="hint" id="hint"></div>
 </div>
 
+<!-- QR Modal -->
 <div class="qr-overlay" id="qr-overlay" onclick="hideQR(event)">
   <div class="qr-box">
     <h2>📲 扫码加入游戏</h2>
@@ -118,94 +179,155 @@ const SUITS=['♠','♥','♦','♣'];
 const RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const VAL={A:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13};
 const MEDALS=['🥇','🥈','🥉'];
-let players=[{name:'玩家1',sips:0},{name:'玩家2',sips:0}];
-let curIdx=0,cells=[],selCell=null,phase='select',lastRes=null,deck=[];
-let qrGenerated=false;
+const BINGO_LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+let players=[];
+let curIdx=0,cells=[],selCell=null,phase='select',lastRes=null;
+let gameMode='normal',qrGenerated=false;
+
+function setupAddPlayer(){
+  const inp=document.getElementById('setup-np');
+  const name=inp.value.trim();
+  if(!name||players.length>=10)return;
+  players.push({name,sips:0});
+  inp.value='';
+  renderSetupList();
+  updateModeButtons();
+}
+function setupRemovePlayer(i){
+  players.splice(i,1);
+  renderSetupList();
+  updateModeButtons();
+}
+function renderSetupList(){
+  const el=document.getElementById('setup-player-list');
+  if(!players.length){el.innerHTML=`<div class="empty-hint">还没有玩家，快来添加！</div>`;return;}
+  el.innerHTML=players.map((p,i)=>`
+    <div class="player-item">
+      <span class="pidx">${i+1}.</span>
+      <span class="pname">${p.name}</span>
+      <button class="del" onclick="setupRemovePlayer(${i})">✕</button>
+    </div>`).join('');
+}
+function updateModeButtons(){
+  const ok=players.length>=2;
+  document.getElementById('need-warn').style.display=ok?'none':'block';
+  document.getElementById('btn-normal').classList.toggle('disabled',!ok);
+  document.getElementById('btn-hell').classList.toggle('disabled',!ok);
+}
 
 function buildDeck(){
-  deck=[];
-  for(const s of SUITS)for(const r of RANKS)deck.push({type:'normal',rank:r,suit:s});
-  deck.push({type:'bomb'});
-  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  const d=[];
+  for(const s of SUITS)for(const r of RANKS)d.push({type:'normal',rank:r,suit:s});
+  d.push({type:'bomb'});
+  for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}
+  return d;
 }
-function draw(){if(!deck.length)buildDeck();return deck.pop();}
+function drawFrom(deck){
+  if(!deck.length)buildDeck().forEach(c=>deck.push(c));
+  return deck.pop();
+}
 function isRed(s){return s==='♥'||s==='♦';}
 function topCard(c){return c.stack[c.stack.length-1];}
 function hasBomb(c){return c.stack.some(x=>x.type==='bomb');}
 function cardLabel(c){return c.type==='bomb'?'💣炸弹':c.rank+c.suit;}
 
 function newBoard(){
-  buildDeck();cells=[];
-  for(let i=0;i<9;i++)cells.push({stack:[draw()]});
+  cells=[];
+  for(let i=0;i<9;i++){
+    const deck=buildDeck();
+    let initCard=null;
+    for(let j=deck.length-1;j>=0;j--){if(deck[j].type==='normal'){initCard=deck.splice(j,1)[0];break;}}
+    cells.push({stack:[initCard],deck});
+  }
   selCell=null;phase='select';lastRes=null;
 }
 
-function renderGrid(){
+function checkBingo(){
+  for(const line of BINGO_LINES){
+    const tops=line.map(i=>topCard(cells[i]));
+    if(tops.every(t=>t.type==='normal')&&tops[0].rank===tops[1].rank&&tops[1].rank===tops[2].rank)return line;
+  }
+  return null;
+}
+
+function startGame(mode){
+  if(players.length<2){document.getElementById('need-warn').style.display='block';return;}
+  gameMode=mode;
+  players.forEach(p=>p.sips=0);
+  curIdx=0;
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('game-screen').style.display='block';
+  if(mode==='hell'){
+    document.getElementById('hell-banner').style.display='block';
+    document.getElementById('mode-label').textContent='🔥 地狱玩法 · 炸弹 · 龙门框 · BINGO连喝';
+    document.getElementById('hint').innerHTML='A=1最小 · K=13最大 · <span class="dragon">同号=龙门框×2</span> · <span class="bl">💣×2</span> · <span class="bingo">三格同号连线=BINGO全喝</span>';
+  } else {
+    document.getElementById('hell-banner').style.display='none';
+    document.getElementById('mode-label').textContent='🍺 普通玩法 · 每格独立牌堆 · 炸弹只在翻牌时出现';
+    document.getElementById('hint').innerHTML='A=1最小 · K=13最大 · <span class="dragon">同号=龙门框×2</span> · 猜错继续 · <span class="bl">💣炸弹×2</span>（翻牌时才出现）';
+  }
+  newBoard();renderGrid();renderPlayers();renderLB();renderPanel();
+}
+
+function backToSetup(){
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('setup-screen').style.display='block';
+  renderSetupList();updateModeButtons();
+}
+
+function renderGrid(bingoLine=null){
   document.getElementById('grid').innerHTML=cells.map((c,i)=>{
     const t=topCard(c);
     const isBombTop=t.type==='bomb';
     const locked=phase!=='select'&&selCell!==i;
-    const selClass=selCell===i?'selected':'';
-    const lockClass=locked?'locked':'';
+    const sel=selCell===i?'selected':'';
+    const lock=locked?'locked':'';
     const bombClass=isBombTop?'is-bomb':'';
+    const bingoClass=bingoLine&&bingoLine.includes(i)?'bingo-hit':'';
     const badge=c.stack.length>1?`<div class="sbadge">x${c.stack.length}</div>`:'';
     const dbl=hasBomb(c)&&!isBombTop?`<div class="dbadge">💣x2</div>`:'';
     let inner='';
-    if(isBombTop){
-      inner=`${badge}${dbl}<span class="bomb-icon">💣</span>`;
-    } else {
-      const cc=isRed(t.suit)?'red-s':'blk-s';
-      inner=`${badge}${dbl}<div class="rank ${cc}">${t.rank}</div><div class="suit ${cc}">${t.suit}</div>`;
-    }
-    return `<div class="cell ${selClass} ${lockClass} ${bombClass}" onclick="selectCell(${i})">${inner}</div>`;
+    if(isBombTop){inner=`${badge}${dbl}<span class="bomb-icon">💣</span>`;}
+    else{const cc=isRed(t.suit)?'red-s':'blk-s';inner=`${badge}${dbl}<div class="rank ${cc}">${t.rank}</div><div class="suit ${cc}">${t.suit}</div>`;}
+    return `<div class="cell ${sel} ${lock} ${bombClass} ${bingoClass}" onclick="selectCell(${i})">${inner}</div>`;
   }).join('');
-  document.getElementById('dinfo').textContent=`剩余牌数: ${deck.length}`;
 }
 
 function renderPlayers(){
   document.getElementById('pbar').innerHTML=players.map((p,i)=>`
     <div class="pchip ${i===curIdx?'active':''}" onclick="setCur(${i})">
       <span>${p.name}</span><span class="sips">🍺${p.sips}</span>
-      ${players.length>1?`<button class="rx" onclick="event.stopPropagation();removePlayer(${i})">x</button>`:''}
     </div>`).join('');
 }
 
 function renderPanel(){
   const el=document.getElementById('panel');
   const p=players[curIdx];
+  if(phase==='bingo'&&lastRes){
+    el.innerHTML=`<div class="banner bingo">🎰 BINGO！三格连线！${p.name} 喝 ${lastRes.bingoSips} 口 🍺</div>
+      <div class="prompt">喝完再继续！</div>
+      <div class="cbtns"><button class="btn primary" onclick="afterBingo()">喝完，继续 →</button></div>`;
+    return;
+  }
   if(phase==='select'){el.innerHTML=`<div class="prompt"><strong>${p.name}</strong>，请选一个格子</div>`;return;}
-  const cell=cells[selCell];
-  const t=topCard(cell);
-  const isBombTop=t.type==='bomb';
+  const cell=cells[selCell];const t=topCard(cell);const isBombTop=t.type==='bomb';
   if(phase==='guess'){
-    const label=isBombTop
-      ?`格子是 <span class="bl">💣炸弹</span>！猜下一张（输了双倍）`
-      :`当前牌 <strong>${t.rank}${t.suit}</strong> — 猜下一张`;
-    el.innerHTML=`<div class="prompt">${label}</div>
-      <div class="gbtns">
-        <button class="gbtn" onclick="makeGuess('big')">↑ 大</button>
-        <button class="gbtn" onclick="makeGuess('small')">↓ 小</button>
-      </div>`;
+    el.innerHTML=`<div class="prompt">${isBombTop?`格子是 <span class="bl">💣炸弹</span>！猜下一张（输了双倍）`:`当前牌 <strong>${t.rank}${t.suit}</strong> — 猜下一张`}</div>
+      <div class="gbtns"><button class="gbtn" onclick="makeGuess('big')">↑ 大</button><button class="gbtn" onclick="makeGuess('small')">↓ 小</button></div>`;
   } else if(phase==='win'){
-    el.innerHTML=`
-      <div class="banner win">✅ 猜对了！翻出 ${cardLabel(lastRes.newCard)}</div>
+    el.innerHTML=`<div class="banner win">✅ 猜对了！翻出 ${cardLabel(lastRes.newCard)}</div>
       <div class="prompt">继续选格子，还是 pass？</div>
-      <div class="cbtns">
-        <button class="btn primary" onclick="doContinue()">继续选格 →</button>
-        <button class="btn" onclick="doPass()">Pass 给下家</button>
-      </div>`;
+      <div class="cbtns"><button class="btn primary" onclick="doContinue()">继续选格 →</button><button class="btn" onclick="doPass()">Pass 给下家</button></div>`;
   } else if(phase==='lose'){
     const {newCard,sips,doubled,dragon}=lastRes;
-    let bannerClass='lose',extra='';
-    if(dragon&&doubled){bannerClass='dragon';extra='🐉 中龙门框 + 💣炸弹 x4！ ';}
-    else if(dragon){bannerClass='dragon';extra='🐉 中龙门框！x2 ';}
-    else if(doubled){bannerClass='bomb-lose';extra='💣 炸弹双倍！';}
-    el.innerHTML=`
-      <div class="banner ${bannerClass}">❌ 翻出 ${cardLabel(newCard)} — ${extra}${p.name} 喝 ${sips} 口 🍺</div>
+    let bc='lose',ex='';
+    if(dragon&&doubled){bc='dragon';ex='🐉 龙门框+💣 x4！ ';}
+    else if(dragon){bc='dragon';ex='🐉 中龙门框！x2 ';}
+    else if(doubled){bc='bomb-lose';ex='💣 炸弹双倍！';}
+    el.innerHTML=`<div class="banner ${bc}">❌ 翻出 ${cardLabel(newCard)} — ${ex}${p.name} 喝 ${sips} 口 🍺</div>
       <div class="prompt">喝完继续猜这格。</div>
-      <div class="cbtns">
-        <button class="btn primary" onclick="doLoseContinue()">喝完，继续猜 →</button>
-      </div>`;
+      <div class="cbtns"><button class="btn primary" onclick="doLoseContinue()">喝完，继续猜 →</button></div>`;
   }
 }
 
@@ -213,13 +335,11 @@ function renderLB(){
   const el=document.getElementById('lb');
   const sorted=[...players].sort((a,b)=>b.sips-a.sips);
   const max=sorted[0]?.sips||0;
-  if(max===0){el.innerHTML=`<div class="lb-empty">还没有人喝酒</div>`;return;}
+  if(!max){el.innerHTML=`<div class="lb-empty">还没有人喝酒</div>`;return;}
   el.innerHTML=sorted.map((p,i)=>{
-    const medal=i<3?MEDALS[i]:`${i+1}`;
-    const rankClass=i===0?'rank1':'';
-    const barW=max>0?Math.round((p.sips/max)*100):0;
-    return `<div class="lb-row ${rankClass}">
-      <span class="lb-medal">${medal}</span>
+    const barW=max?Math.round((p.sips/max)*100):0;
+    return `<div class="lb-row ${i===0?'rank1':''}">
+      <span class="lb-medal">${i<3?MEDALS[i]:i+1}</span>
       <span class="lb-name">${p.name}</span>
       <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barW}%"></div></div>
       <span class="lb-sips">🍺 ${p.sips} 口</span>
@@ -230,70 +350,56 @@ function renderLB(){
 function selectCell(i){if(phase!=='select')return;selCell=i;phase='guess';renderGrid();renderPanel();}
 
 function makeGuess(guess){
-  const cell=cells[selCell];
-  const curr=topCard(cell);
-  const newCard=draw();
+  const cell=cells[selCell];const curr=topCard(cell);const newCard=drawFrom(cell.deck);
   let correct=false,dragon=false;
   if(newCard.type==='bomb'){correct=false;}
   else if(curr.type==='bomb'){
     const normals=cell.stack.filter(c=>c.type==='normal');
-    if(normals.length>=1){
-      const prev=normals[normals.length-1];
+    if(normals.length>=1){const prev=normals[normals.length-1];
       if(VAL[newCard.rank]===VAL[prev.rank]){correct=false;dragon=true;}
       else correct=(guess==='big'&&VAL[newCard.rank]>VAL[prev.rank])||(guess==='small'&&VAL[newCard.rank]<VAL[prev.rank]);
-    } else {correct=false;}
+    }
   } else {
     if(VAL[newCard.rank]===VAL[curr.rank]){correct=false;dragon=true;}
     else correct=(guess==='big'&&VAL[newCard.rank]>VAL[curr.rank])||(guess==='small'&&VAL[newCard.rank]<VAL[curr.rank]);
   }
   cell.stack.push(newCard);
-  if(correct){lastRes={newCard};phase='win';}
-  else{
-    const doubled=hasBomb(cell);
-    let sips=cell.stack.length;
-    if(dragon)sips*=2;
-    if(doubled)sips*=2;
-    players[curIdx].sips+=sips;
-    lastRes={newCard,sips,doubled,dragon};phase='lose';
+  if(correct){
+    if(gameMode==='hell'){const bLine=checkBingo();if(bLine){const bingoSips=bLine.reduce((s,i)=>s+cells[i].stack.length,0);players[curIdx].sips+=bingoSips;lastRes={newCard,bingoLine:bLine,bingoSips};phase='bingo';renderGrid(bLine);renderPlayers();renderLB();renderPanel();return;}}
+    lastRes={newCard};phase='win';
+  } else {
+    const doubled=hasBomb(cell);let sips=cell.stack.length;
+    if(dragon)sips*=2;if(doubled)sips*=2;
+    players[curIdx].sips+=sips;lastRes={newCard,sips,doubled,dragon};phase='lose';
   }
   renderGrid();renderPlayers();renderLB();renderPanel();
 }
 
+function afterBingo(){
+  lastRes.bingoLine.forEach(i=>{let card=null;while(!card){const c=drawFrom(cells[i].deck);if(c.type==='normal')card=c;else cells[i].deck.unshift(c);}cells[i].stack=[card];});
+  selCell=null;phase='select';renderGrid();renderPanel();
+}
 function doContinue(){selCell=null;phase='select';renderGrid();renderPanel();}
 function doPass(){curIdx=(curIdx+1)%players.length;selCell=null;phase='select';renderGrid();renderPlayers();renderPanel();}
-function doLoseContinue(){cells[selCell].stack=[draw()];renderGrid();phase='guess';renderPanel();}
+function doLoseContinue(){
+  const cell=cells[selCell];let card=null;
+  while(!card){const c=drawFrom(cell.deck);if(c.type==='normal')card=c;else cell.deck.unshift(c);}
+  cell.stack=[card];renderGrid();phase='guess';renderPanel();
+}
 function setCur(i){if(phase!=='select')return;curIdx=i;renderPlayers();renderPanel();}
-function addPlayer(){
-  const inp=document.getElementById('np');const name=inp.value.trim();if(!name)return;
-  players.push({name,sips:0});inp.value='';renderPlayers();renderLB();renderPanel();
-}
-function removePlayer(i){
-  if(players.length<=1)return;players.splice(i,1);
-  if(curIdx>=players.length)curIdx=0;renderPlayers();renderLB();renderPanel();
-}
 function resetBoard(){newBoard();renderGrid();renderPlayers();renderLB();renderPanel();}
 function resetSips(){players.forEach(p=>p.sips=0);renderPlayers();renderLB();}
 
 function showQR(){
-  const overlay=document.getElementById('qr-overlay');
-  overlay.classList.add('show');
+  document.getElementById('qr-overlay').classList.add('show');
   if(!qrGenerated){
     const url=window.location.href;
     document.getElementById('qr-url').textContent=url;
-    new QRCode(document.getElementById('qr-canvas'),{
-      text:url,width:180,height:180,
-      colorDark:'#1a1a1a',colorLight:'#ffffff',
-      correctLevel:QRCode.CorrectLevel.M
-    });
+    new QRCode(document.getElementById('qr-canvas'),{text:url,width:200,height:200,colorDark:'#1a1a1a',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
     qrGenerated=true;
   }
 }
-function hideQR(e){
-  if(e.target===document.getElementById('qr-overlay'))
-    document.getElementById('qr-overlay').classList.remove('show');
-}
-
-newBoard();renderGrid();renderPlayers();renderLB();renderPanel();
+function hideQR(e){if(e.target===document.getElementById('qr-overlay'))document.getElementById('qr-overlay').classList.remove('show');}
 </script>
 </body>
 </html>
