@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>九宫格喝酒 🎴</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;min-height:100vh;padding:16px;}
@@ -14,24 +13,36 @@
   .sub{font-size:12px;color:#888;text-align:center;margin-bottom:20px;}
   .card-box{background:white;border-radius:14px;padding:18px;margin-bottom:14px;border:1px solid #eee;box-shadow:0 2px 8px rgba(0,0,0,0.04);}
   .label{font-size:13px;font-weight:600;color:#888;margin-bottom:8px;}
-  .row{display:flex;gap:8px;margin-bottom:10px;}
-  .row input{flex:1;padding:10px 12px;border-radius:10px;border:1px solid #ddd;font-size:14px;color:#1a1a1a;outline:none;}
-  .row input:focus{border-color:#D85A30;}
-  .btn{padding:10px 18px;border-radius:10px;border:1px solid #ddd;background:white;font-size:14px;cursor:pointer;color:#1a1a1a;font-weight:500;white-space:nowrap;}
-  .btn:hover{background:#f5f5f5;}
+  .inp{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #ddd;font-size:14px;color:#1a1a1a;outline:none;margin-bottom:10px;}
+  .inp:focus{border-color:#D85A30;}
+  .inp.code{text-align:center;letter-spacing:6px;font-size:22px;font-weight:700;text-transform:uppercase;}
+  .btn{padding:10px 18px;border-radius:10px;border:1px solid #ddd;background:white;font-size:14px;cursor:pointer;color:#1a1a1a;font-weight:500;}
   .btn.primary{background:#D85A30;color:white;border-color:#D85A30;}
   .btn.primary:hover{background:#b84a25;}
-  .btn.full{width:100%;text-align:center;padding:13px;}
+  .btn.full{width:100%;text-align:center;padding:13px;display:block;}
   .btn.hell{background:#1a0a0a;color:#FF6B6B;border-color:#5a1a1a;}
-  .btn.hell:hover{background:#2a0f0f;}
   .btn.disabled{opacity:0.35;cursor:not-allowed;pointer-events:none;}
+  .btn.green{background:#22c55e;color:white;border-color:#16a34a;}
+  .big-option{display:flex;flex-direction:column;gap:12px;margin-bottom:4px;}
+  .big-btn{border-radius:14px;padding:20px 18px;cursor:pointer;border:2px solid #eee;background:white;text-align:left;transition:all 0.15s;}
+  .big-btn:hover{border-color:#D85A30;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.08);}
+  .big-btn .icon{font-size:28px;margin-bottom:6px;}
+  .big-btn .title{font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:3px;}
+  .big-btn .desc{font-size:12px;color:#888;line-height:1.5;}
+  .big-btn.online{border-color:#4A90D9;background:#f0f7ff;}
+  .big-btn.online:hover{border-color:#1a6fc4;}
+  /* Player list */
   .player-item{display:flex;align-items:center;padding:9px 12px;background:#f9f9f9;border-radius:10px;margin-bottom:6px;}
   .pidx{font-size:12px;color:#bbb;margin-right:8px;min-width:18px;}
   .pname{flex:1;font-size:14px;color:#1a1a1a;font-weight:500;}
   .del{background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;}
   .del:hover{color:#E24B4A;}
+  .rejoin-item{display:flex;align-items:center;padding:9px 12px;background:#fff8e8;border:1px solid #fac765;border-radius:10px;margin-bottom:6px;}
+  .rejoin-name{flex:1;font-size:14px;color:#1a1a1a;font-weight:500;}
+  .rejoin-sips{font-size:12px;color:#888;margin-right:10px;}
+  .rejoin-btn{padding:5px 12px;border-radius:8px;border:none;background:#D85A30;color:white;font-size:12px;font-weight:700;cursor:pointer;}
   .empty-hint{font-size:13px;color:#ccc;text-align:center;padding:12px;}
-  .warn{font-size:12px;color:#E24B4A;text-align:center;padding:8px;background:#fff0f0;border-radius:8px;margin-bottom:10px;}
+  .warn{font-size:12px;color:#E24B4A;text-align:center;padding:8px;background:#fff0f0;border-radius:8px;margin-top:8px;}
   .room-code-box{background:#0f2744;border-radius:14px;padding:20px;text-align:center;margin-bottom:14px;}
   .room-code{font-size:42px;font-weight:700;color:#4A90D9;letter-spacing:8px;margin:8px 0;}
   .room-code-label{font-size:12px;color:#aaa;}
@@ -41,10 +52,11 @@
   .header p{font-size:12px;color:#888;margin-top:3px;}
   .hell-banner{background:#1a0a0a;border:1px solid #5a1a1a;border-radius:10px;padding:6px 12px;text-align:center;font-size:12px;color:#FF6B6B;font-weight:600;margin-bottom:10px;}
   .pbar{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;margin-bottom:6px;}
-  .pchip{flex-shrink:0;background:#eee;padding:7px 12px;border-radius:999px;font-size:13px;color:#555;display:flex;align-items:center;gap:5px;border:1.5px solid transparent;}
+  .pchip{flex-shrink:0;background:#eee;padding:7px 12px;border-radius:999px;font-size:13px;color:#555;display:flex;align-items:center;gap:5px;border:1.5px solid transparent;cursor:pointer;}
   .pchip.active{background:#D85A30;color:white;font-weight:600;border-color:#993C1D;}
   .pchip.me{border-color:#4A90D9;}
   .pchip .sips{font-size:11px;opacity:0.85;}
+  .pchip .rejoined{font-size:9px;background:#22c55e;color:white;padding:1px 5px;border-radius:999px;margin-left:2px;}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px;}
   .cell{aspect-ratio:5/7;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;user-select:none;border:1px solid #1a3a5c;background:#0f2744;padding:4px;transition:transform 0.1s;}
   .cell:hover:not(.locked){transform:translateY(-2px);border-color:#4A90D9;box-shadow:0 4px 14px rgba(74,144,217,0.3);}
@@ -58,8 +70,7 @@
   .sbadge{position:absolute;top:4px;right:5px;background:#4A90D9;color:white;font-size:20px;font-weight:700;padding:3px 7px;border-radius:999px;min-width:32px;text-align:center;line-height:1.3;}
   .is-bomb .sbadge{background:#501313;}
   .dbadge{position:absolute;top:4px;left:5px;background:#501313;color:#fcc;font-size:16px;font-weight:700;padding:2px 7px;border-radius:999px;}
-  .red-s{color:#FF6B6B;}
-  .blk-s{color:#E8EEF5;}
+  .red-s{color:#FF6B6B;} .blk-s{color:#E8EEF5;}
   .panel{background:white;border-radius:14px;padding:14px;margin-bottom:10px;min-height:76px;border:1px solid #eee;}
   .prompt{font-size:14px;color:#666;text-align:center;margin-bottom:10px;line-height:1.5;}
   .prompt strong{color:#1a1a1a;font-weight:700;}
@@ -88,12 +99,20 @@
   .footer-btns{display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap;}
   .footer-btns .btn{font-size:12px;padding:7px 14px;}
   .hint{font-size:11px;color:#bbb;text-align:center;line-height:1.6;margin-top:8px;padding:8px;background:white;border-radius:10px;border:1px solid #eee;}
-  .hint .bl{color:#E24B4A;}
-  .hint .dragon{color:#9B6FD4;}
-  .hint .bingo{color:#DAA520;}
-  .waiting-badge{display:inline-block;background:#eee;color:#888;font-size:12px;padding:4px 10px;border-radius:999px;margin:2px;}
-  .waiting-badge.ready{background:#e8f5e9;color:#2e7d32;}
-  /* QR */
+  .hint .bl{color:#E24B4A;} .hint .dragon{color:#9B6FD4;} .hint .bingo{color:#DAA520;}
+  .not-your-turn{background:#fff8e8;border:1px solid #fac765;border-radius:10px;padding:12px;text-align:center;font-size:14px;color:#888;}
+  .mode-cards{display:flex;gap:12px;}
+  .mode-card{flex:1;border-radius:14px;padding:18px 12px;cursor:pointer;border:2px solid #ddd;background:white;text-align:center;transition:all 0.15s;}
+  .mode-card:not(.disabled):hover{transform:translateY(-2px);}
+  .mode-card.normal:not(.disabled):hover{border-color:#4A90D9;}
+  .mode-card.hell{background:#1a0a0a;border-color:#3a1515;}
+  .mode-card.hell:not(.disabled):hover{border-color:#E24B4A;}
+  .mode-card.disabled{opacity:0.35;cursor:not-allowed;pointer-events:none;}
+  .mode-card .icon{font-size:32px;margin-bottom:6px;}
+  .mode-card .mtitle{font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:4px;}
+  .mode-card.hell .mtitle{color:#FF6B6B;}
+  .mode-card .mdesc{font-size:11px;color:#888;line-height:1.5;}
+  .mode-card.hell .mdesc{color:#999;}
   .qr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;}
   .qr-overlay.show{display:flex;}
   .qr-box{background:white;border-radius:20px;padding:24px;max-width:290px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
@@ -102,37 +121,97 @@
   #qr-canvas{display:flex;justify-content:center;margin-bottom:12px;}
   .qr-url{font-size:10px;color:#aaa;word-break:break-all;background:#f5f5f5;padding:6px 8px;border-radius:8px;margin-bottom:14px;}
   .qr-close{padding:8px 24px;border-radius:10px;border:none;background:#D85A30;color:white;font-size:14px;font-weight:700;cursor:pointer;}
-  .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
-  .status-dot.green{background:#22c55e;}
-  .status-dot.red{background:#ef4444;}
-  .status-dot.yellow{background:#f59e0b;}
-  .not-your-turn{background:#fff8e8;border:1px solid #fac765;border-radius:10px;padding:12px;text-align:center;font-size:14px;color:#888;}
 </style>
 </head>
 <body>
 
-<!-- SCREEN 1: HOME -->
+<!-- HOME -->
 <div id="screen-home" class="screen active">
   <br>
   <h1>🎴 九宫格喝酒</h1>
-  <div class="sub">多人联机版 · 每人用自己手机玩</div>
-  <div class="card-box">
-    <div class="label">你的名字</div>
-    <div class="row">
-      <input id="my-name" type="text" placeholder="输入你的名字" maxlength="10"/>
+  <div class="sub">选择游戏方式</div>
+  <div class="big-option">
+    <div class="big-btn" onclick="showScreen('screen-local')">
+      <div class="icon">📱</div>
+      <div class="title">本地多人游戏</div>
+      <div class="desc">一台手机，轮流操作<br>不需要网络 · 最多10人</div>
     </div>
-    <button class="btn primary full" onclick="goCreate()">🏠 创建房间</button>
-    <br><br>
-    <div class="label">加入已有房间</div>
-    <div class="row">
-      <input id="join-code" type="text" placeholder="输入4位房间码" maxlength="4" style="text-transform:uppercase;letter-spacing:4px;font-size:18px;font-weight:700;"/>
-      <button class="btn primary" onclick="goJoin()">加入</button>
+    <div class="big-btn online" onclick="showScreen('screen-online')">
+      <div class="icon">🌐</div>
+      <div class="title">联机多人游戏</div>
+      <div class="desc">每人用自己的手机<br>扫码加入同一局游戏</div>
     </div>
   </div>
-  <div class="warn" id="home-warn" style="display:none;"></div>
 </div>
 
-<!-- SCREEN 2: LOBBY (HOST) -->
+<!-- LOCAL SETUP -->
+<div id="screen-local" class="screen">
+  <br>
+  <h1>📱 本地多人游戏</h1>
+  <div class="sub">添加玩家后选模式开始</div>
+  <div class="card-box">
+    <div class="label">👥 玩家（至少 2 人）</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      <input class="inp" id="local-np" type="text" placeholder="输入玩家名字" maxlength="10" style="margin:0;flex:1;" onkeydown="if(event.key==='Enter')localAddPlayer()"/>
+      <button class="btn primary" onclick="localAddPlayer()">+ 添加</button>
+    </div>
+    <div id="local-player-list"><div class="empty-hint">还没有玩家</div></div>
+    <div class="warn" id="local-warn" style="display:none;"></div>
+  </div>
+  <div class="card-box">
+    <div class="label">🎮 选择模式开始</div>
+    <div class="mode-cards">
+      <div class="mode-card normal disabled" id="local-btn-normal" onclick="localStart('normal')">
+        <div class="icon">🍺</div><div class="mtitle">普通</div>
+        <div class="mdesc">炸弹·龙门框</div>
+      </div>
+      <div class="mode-card hell disabled" id="local-btn-hell" onclick="localStart('hell')">
+        <div class="icon">🔥</div><div class="mtitle">地狱</div>
+        <div class="mdesc">+BINGO连喝</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-btns"><button class="btn" onclick="showScreen('screen-home')">← 返回</button></div>
+</div>
+
+<!-- ONLINE -->
+<div id="screen-online" class="screen">
+  <br>
+  <h1>🌐 联机游戏</h1>
+  <div class="sub">创建或加入房间</div>
+  <div class="card-box">
+    <div class="label">你的名字</div>
+    <input class="inp" id="my-name" type="text" placeholder="输入你的名字" maxlength="10"/>
+    <button class="btn primary full" onclick="goCreate()">🏠 创建房间</button>
+  </div>
+  <div class="card-box">
+    <div class="label">加入已有房间</div>
+    <input class="inp code" id="join-code" type="text" placeholder="XXXX" maxlength="4"/>
+    <button class="btn primary full" onclick="goJoin()">加入房间</button>
+  </div>
+  <div class="warn" id="home-warn" style="display:none;"></div>
+  <div class="footer-btns"><button class="btn" onclick="showScreen('screen-home')">← 返回</button></div>
+</div>
+
+<!-- REJOIN: pick existing player -->
+<div id="screen-rejoin" class="screen">
+  <br>
+  <h1>🔄 重新加入</h1>
+  <div class="sub">选择你的名字继续游戏</div>
+  <div class="card-box">
+    <div class="label">现有玩家（点「继续」恢复）</div>
+    <div id="rejoin-list"></div>
+  </div>
+  <div class="card-box">
+    <div class="label">以新玩家身份加入</div>
+    <input class="inp" id="rejoin-new-name" type="text" placeholder="输入新名字" maxlength="10"/>
+    <button class="btn primary full" onclick="joinAsNew()">加入为新玩家</button>
+  </div>
+  <div class="warn" id="rejoin-warn" style="display:none;"></div>
+  <div class="footer-btns"><button class="btn" onclick="showScreen('screen-online')">← 返回</button></div>
+</div>
+
+<!-- LOBBY (HOST) -->
 <div id="screen-lobby" class="screen">
   <br>
   <h1>🏠 游戏房间</h1>
@@ -140,26 +219,28 @@
   <div class="room-code-box">
     <div class="room-code-label">房间码</div>
     <div class="room-code" id="lobby-code">----</div>
-    <button class="btn" onclick="showQR()" style="background:rgba(255,255,255,0.1);color:white;border-color:rgba(255,255,255,0.2);font-size:12px;padding:6px 14px;">📲 显示二维码</button>
+    <button class="btn" onclick="showQR()" style="background:rgba(255,255,255,0.1);color:white;border-color:rgba(255,255,255,0.2);font-size:12px;padding:6px 14px;margin-top:8px;">📲 显示二维码</button>
   </div>
   <div class="card-box">
     <div class="label">已加入的玩家 <span id="player-count">(0/10)</span></div>
     <div id="lobby-players"></div>
   </div>
   <div class="card-box">
-    <div class="label">🎮 选择模式</div>
-    <div class="row" style="gap:10px;">
-      <button class="btn full" id="lobby-normal" onclick="startGame('normal')" style="flex:1;">🍺 普通</button>
-      <button class="btn full hell" id="lobby-hell" onclick="startGame('hell')" style="flex:1;">🔥 地狱</button>
+    <div class="label">🎮 选择模式开始</div>
+    <div class="mode-cards">
+      <div class="mode-card normal disabled" id="lobby-normal" onclick="startGame('normal')">
+        <div class="icon">🍺</div><div class="mtitle">普通</div><div class="mdesc">炸弹·龙门框</div>
+      </div>
+      <div class="mode-card hell disabled" id="lobby-hell" onclick="startGame('hell')">
+        <div class="icon">🔥</div><div class="mtitle">地狱</div><div class="mdesc">+BINGO连喝</div>
+      </div>
     </div>
     <div class="warn" id="lobby-warn" style="display:none;"></div>
   </div>
-  <div class="footer-btns">
-    <button class="btn" onclick="leaveRoom()">← 离开</button>
-  </div>
+  <div class="footer-btns"><button class="btn" onclick="leaveRoom()">← 离开</button></div>
 </div>
 
-<!-- SCREEN 3: WAITING (GUEST) -->
+<!-- WAITING (GUEST) -->
 <div id="screen-waiting" class="screen">
   <br>
   <h1>⏳ 等待开始</h1>
@@ -172,12 +253,10 @@
     <div class="label">已加入的玩家</div>
     <div id="waiting-players"></div>
   </div>
-  <div class="footer-btns">
-    <button class="btn" onclick="leaveRoom()">← 离开</button>
-  </div>
+  <div class="footer-btns"><button class="btn" onclick="leaveRoom()">← 离开</button></div>
 </div>
 
-<!-- SCREEN 4: GAME -->
+<!-- GAME (shared for local + online) -->
 <div id="screen-game" class="screen">
   <div class="header">
     <h1>🎴 九宫格喝酒</h1>
@@ -187,13 +266,10 @@
   <div class="pbar" id="game-pbar"></div>
   <div class="grid" id="grid"></div>
   <div class="panel" id="panel"></div>
-  <div class="lb-wrap">
-    <div class="lb-title">🏆 喝酒排行榜</div>
-    <div id="lb"></div>
-  </div>
+  <div class="lb-wrap"><div class="lb-title">🏆 喝酒排行榜</div><div id="lb"></div></div>
   <div class="footer-btns">
-    <button class="btn" onclick="showQR()">📲 扫码</button>
-    <button class="btn" onclick="leaveRoom()">← 离开</button>
+    <button class="btn" id="btn-qr" onclick="showQR()" style="display:none;">📲 扫码</button>
+    <button class="btn" onclick="leaveGame()">← 离开</button>
   </div>
   <div class="hint" id="game-hint"></div>
 </div>
@@ -202,16 +278,17 @@
 <div class="qr-overlay" id="qr-overlay" onclick="hideQR(event)">
   <div class="qr-box">
     <h2>📲 扫码加入游戏</h2>
-    <p id="qr-desc">把手机对准二维码加入！</p>
+    <p id="qr-desc">扫码直接进入房间！</p>
     <div id="qr-canvas"></div>
     <div class="qr-url" id="qr-url"></div>
     <button class="qr-close" onclick="document.getElementById('qr-overlay').classList.remove('show')">关闭</button>
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, update, push, remove, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, get, onValue, update, remove, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyArAnURJrH-BzEm-GX2YRgpRlwY-Z06zv0",
@@ -225,19 +302,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// ─── Constants ───────────────────────────────────────────
+// ── Constants ──────────────────────────────────────────────
 const SUITS=['♠','♥','♦','♣'];
 const RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const VAL={A:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13};
 const MEDALS=['🥇','🥈','🥉'];
 const BINGO_LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
-// ─── State ────────────────────────────────────────────────
-let myName='', myId='', roomCode='', isHost=false;
-let roomRef=null, gameRef=null, listeners=[];
-let qrGenerated=false, qrMode='room';
+// ── State ──────────────────────────────────────────────────
+let myName='', myId='', roomCode='', isHost=false, isOnline=false;
+let roomRef=null, activeListener=null;
+// Local mode state
+let localPlayers=[], localCurIdx=0, localCells=[], localPhase='select', localSelCell=-1, localLastRes=null, localMode='normal';
 
-// ─── Deck helpers ─────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────
+window.showScreen=function(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');};
+function showWarn(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',3000);}
+function genCode(){return Math.random().toString(36).substring(2,6).toUpperCase();}
 function buildDeck(){
   const d=[];
   for(const s of SUITS)for(const r of RANKS)d.push({type:'normal',rank:r,suit:s});
@@ -249,264 +330,138 @@ function isRed(s){return s==='♥'||s==='♦';}
 function topCard(stack){return stack[stack.length-1];}
 function hasBomb(stack){return stack.some(c=>c.type==='bomb');}
 function cardLabel(c){return c.type==='bomb'?'💣炸弹':c.rank+c.suit;}
-
-// ─── Screens ──────────────────────────────────────────────
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-'+id).classList.add('active');
-}
-
-// ─── Room code ────────────────────────────────────────────
-function genCode(){return Math.random().toString(36).substring(2,6).toUpperCase();}
-
-// ─── HOME ─────────────────────────────────────────────────
-window.goCreate=async function(){
-  const name=document.getElementById('my-name').value.trim();
-  if(!name){showWarn('home-warn','请输入你的名字');return;}
-  myName=name; myId=Date.now().toString(); isHost=true;
-  roomCode=genCode();
-  roomRef=ref(db,`rooms/${roomCode}`);
-  await set(roomRef,{
-    host:myId, status:'lobby', mode:'normal',
-    players:{[myId]:{name,sips:0,id:myId}},
-    cells:null, curPlayer:null, phase:'select', lastRes:null
-  });
-  document.getElementById('lobby-code').textContent=roomCode;
-  listenLobby();
-  showScreen('lobby');
-};
-
-window.goJoin=async function(){
-  const name=document.getElementById('my-name').value.trim();
-  const code=document.getElementById('join-code').value.trim().toUpperCase();
-  if(!name){showWarn('home-warn','请输入你的名字');return;}
-  if(code.length!==4){showWarn('home-warn','请输入4位房间码');return;}
-  myName=name; myId=Date.now().toString(); isHost=false;
-  roomCode=code;
-  roomRef=ref(db,`rooms/${roomCode}`);
-  const snap=await get(roomRef);
-  if(!snap.exists()){showWarn('home-warn','房间不存在，请检查房间码');return;}
-  const room=snap.val();
-  if(room.status==='playing'){showWarn('home-warn','游戏已经开始，无法加入');return;}
-  await update(ref(db,`rooms/${roomCode}/players/${myId}`),{name,sips:0,id:myId});
-  document.getElementById('waiting-code').textContent=roomCode;
-  listenWaiting();
-  showScreen('waiting');
-};
-
-// ─── LOBBY ────────────────────────────────────────────────
-function listenLobby(){
-  const l=onValue(roomRef,snap=>{
-    if(!snap.exists())return;
-    const room=snap.val();
-    renderLobbyPlayers(room.players||{});
-    if(room.status==='playing') enterGame(room);
-  });
-  listeners.push({ref:roomRef,l});
-}
-
-function renderLobbyPlayers(players){
-  const arr=Object.values(players);
-  document.getElementById('player-count').textContent=`(${arr.length}/10)`;
-  const el=document.getElementById('lobby-players');
-  if(!arr.length){el.innerHTML=`<div class="empty-hint">等待玩家加入...</div>`;return;}
-  el.innerHTML=arr.map((p,i)=>`
-    <div class="player-item">
-      <span class="pidx">${i+1}.</span>
-      <span class="pname">${p.name}${p.id===myId?' (你)':''}</span>
-    </div>`).join('');
-  // enable/disable start buttons
-  const ok=arr.length>=2;
-  document.getElementById('lobby-normal').classList.toggle('disabled',!ok);
-  document.getElementById('lobby-hell').classList.toggle('disabled',!ok);
-}
-
-window.startGame=async function(mode){
-  const snap=await get(ref(db,`rooms/${roomCode}/players`));
-  const players=snap.val()||{};
-  const arr=Object.values(players);
-  if(arr.length<2){showWarn('lobby-warn','至少需要2名玩家');return;}
-
-  // Build initial cells — 9 independent decks, no bomb on face card
+function makeBoard(){
   const cells=[];
   for(let i=0;i<9;i++){
     const deck=buildDeck();
-    let initCard=null;
-    for(let j=deck.length-1;j>=0;j--){
-      if(deck[j].type==='normal'){initCard=deck.splice(j,1)[0];break;}
-    }
-    cells.push({stack:[initCard],deck});
+    let init=null;
+    for(let j=deck.length-1;j>=0;j--){if(deck[j].type==='normal'){init=deck.splice(j,1)[0];break;}}
+    cells.push({stack:[init],deck});
   }
-
-  const firstPlayer=arr[0].id;
-  await update(roomRef,{
-    status:'playing', mode,
-    cells:JSON.stringify(cells),
-    curPlayer:firstPlayer,
-    phase:'select', selCell:-1, lastRes:null
-  });
-};
-
-// ─── WAITING ──────────────────────────────────────────────
-function listenWaiting(){
-  const l=onValue(roomRef,snap=>{
-    if(!snap.exists()){leaveRoom();return;}
-    const room=snap.val();
-    renderWaitingPlayers(room.players||{});
-    if(room.status==='playing') enterGame(room);
-  });
-  listeners.push({ref:roomRef,l});
+  return cells;
 }
+function checkBingo(cells){
+  for(const line of BINGO_LINES){
+    const tops=line.map(i=>topCard(cells[i].stack));
+    if(tops.every(t=>t.type==='normal')&&tops[0].rank===tops[1].rank&&tops[1].rank===tops[2].rank)return line;
+  }
+  return null;
+}
+function stopListener(){if(activeListener&&roomRef){off(roomRef,'value',activeListener);activeListener=null;}}
 
-function renderWaitingPlayers(players){
-  const arr=Object.values(players);
-  const el=document.getElementById('waiting-players');
-  el.innerHTML=arr.map((p,i)=>`
+// ══════════════════════════════════════════════════════════
+// LOCAL MODE
+// ══════════════════════════════════════════════════════════
+window.localAddPlayer=function(){
+  const inp=document.getElementById('local-np');
+  const name=inp.value.trim();
+  if(!name||localPlayers.length>=10)return;
+  localPlayers.push({name,sips:0});
+  inp.value='';
+  renderLocalSetup();
+};
+window.localRemovePlayer=function(i){localPlayers.splice(i,1);renderLocalSetup();};
+function renderLocalSetup(){
+  const el=document.getElementById('local-player-list');
+  el.innerHTML=localPlayers.length?localPlayers.map((p,i)=>`
     <div class="player-item">
       <span class="pidx">${i+1}.</span>
-      <span class="pname">${p.name}${p.id===myId?' (你)':''}</span>
+      <span class="pname">${p.name}</span>
+      <button class="del" onclick="localRemovePlayer(${i})">✕</button>
+    </div>`).join(''):`<div class="empty-hint">还没有玩家</div>`;
+  const ok=localPlayers.length>=2;
+  document.getElementById('local-btn-normal').classList.toggle('disabled',!ok);
+  document.getElementById('local-btn-hell').classList.toggle('disabled',!ok);
+}
+window.localStart=function(mode){
+  if(localPlayers.length<2){showWarn('local-warn','至少需要2名玩家');return;}
+  isOnline=false;localMode=mode;localCurIdx=0;localCells=makeBoard();localPhase='select';localSelCell=-1;localLastRes=null;
+  document.getElementById('btn-qr').style.display='none';
+  setupGameUI(mode);
+  renderLocalGame();
+  showScreen('screen-game');
+};
+function renderLocalGame(){
+  const p=localPlayers[localCurIdx];
+  renderGamePlayers_local();
+  renderGrid_local();
+  renderLB_local();
+  renderPanel_local();
+}
+function renderGamePlayers_local(){
+  document.getElementById('game-pbar').innerHTML=localPlayers.map((p,i)=>`
+    <div class="pchip ${i===localCurIdx?'active':''}">
+      <span>${p.name}</span><span class="sips">🍺${p.sips}</span>
     </div>`).join('');
 }
-
-// ─── GAME ─────────────────────────────────────────────────
-function enterGame(room){
-  const mode=room.mode||'normal';
-  document.getElementById('game-mode-label').textContent=mode==='hell'?'🔥 地狱玩法':'🍺 普通玩法';
-  document.getElementById('game-hell-banner').style.display=mode==='hell'?'block':'none';
-  document.getElementById('game-hint').innerHTML=mode==='hell'
-    ?'A=1最小 · K=13最大 · <span class="dragon">同号=龙门框×2</span> · <span class="bl">💣×2</span> · <span class="bingo">三格同号=BINGO全喝</span>'
-    :'A=1最小 · K=13最大 · <span class="dragon">同号=龙门框×2</span> · 猜错继续 · <span class="bl">💣炸弹×2</span>';
-  showScreen('game');
-  listenGame();
-}
-
-function listenGame(){
-  // Remove old listeners
-  listeners.forEach(({ref:r,l})=>off(r,l));
-  listeners=[];
-  const l=onValue(roomRef,snap=>{
-    if(!snap.exists())return;
-    const room=snap.val();
-    if(!room.cells)return;
-    const cells=JSON.parse(room.cells);
-    const players=room.players||{};
-    const mode=room.mode||'normal';
-    const curPlayer=room.curPlayer;
-    const phase=room.phase||'select';
-    const selCell=room.selCell!=null?room.selCell:-1;
-    const lastRes=room.lastRes?JSON.parse(room.lastRes):null;
-    const bingoLine=room.bingoLine?JSON.parse(room.bingoLine):null;
-
-    renderGamePlayers(players,curPlayer);
-    renderGrid(cells,phase,selCell,curPlayer,bingoLine);
-    renderLB(players);
-    renderPanel(players,curPlayer,phase,cells,selCell,lastRes,mode,bingoLine);
-  });
-  listeners.push({ref:roomRef,l});
-}
-
-function renderGamePlayers(players,curPlayer){
-  const arr=Object.values(players);
-  document.getElementById('game-pbar').innerHTML=arr.map(p=>`
-    <div class="pchip ${p.id===curPlayer?'active':''} ${p.id===myId?'me':''}">
-      <span>${p.name}${p.id===myId?' ★':''}</span>
-      <span class="sips">🍺${p.sips||0}</span>
-    </div>`).join('');
-}
-
-function renderGrid(cells,phase,selCell,curPlayer,bingoLine){
-  const myTurn=curPlayer===myId;
-  document.getElementById('grid').innerHTML=cells.map((c,i)=>{
-    const t=topCard(c.stack);
-    const isBombTop=t.type==='bomb';
-    const locked=!myTurn||( phase!=='select'&&selCell!==i);
-    const sel=selCell===i?'selected':'';
+function renderGrid_local(bingoLine=null){
+  const myTurn=true; // local: always your turn
+  document.getElementById('grid').innerHTML=localCells.map((c,i)=>{
+    const t=topCard(c.stack);const isBombTop=t.type==='bomb';
+    const locked=localPhase!=='select'&&localSelCell!==i;
+    const sel=localSelCell===i?'selected':'';
     const lock=locked?'locked':'';
     const bombClass=isBombTop?'is-bomb':'';
     const bingoClass=bingoLine&&bingoLine.includes(i)?'bingo-hit':'';
     const badge=c.stack.length>1?`<div class="sbadge">x${c.stack.length}</div>`:'';
     const dbl=hasBomb(c.stack)&&!isBombTop?`<div class="dbadge">💣x2</div>`:'';
     let inner='';
-    if(isBombTop){inner=`${badge}${dbl}<span class="bomb-icon">💣</span>`;}
+    if(isBombTop)inner=`${badge}${dbl}<span class="bomb-icon">💣</span>`;
     else{const cc=isRed(t.suit)?'red-s':'blk-s';inner=`${badge}${dbl}<div class="rank ${cc}">${t.rank}</div><div class="suit ${cc}">${t.suit}</div>`;}
-    return `<div class="cell ${sel} ${lock} ${bombClass} ${bingoClass}" onclick="cellClick(${i})">${inner}</div>`;
+    return `<div class="cell ${sel} ${lock} ${bombClass} ${bingoClass}" onclick="localCellClick(${i})">${inner}</div>`;
   }).join('');
 }
-
-function renderPanel(players,curPlayer,phase,cells,selCell,lastRes,mode,bingoLine){
-  const el=document.getElementById('panel');
-  const myTurn=curPlayer===myId;
-  const curName=(Object.values(players).find(p=>p.id===curPlayer)||{}).name||'?';
-
-  if(phase==='bingo'&&lastRes){
-    el.innerHTML=`<div class="banner bingo">🎰 BINGO！${curName} 喝 ${lastRes.bingoSips} 口 🍺</div>
-      <div class="prompt">喝完再继续！</div>
-      ${myTurn?`<div class="cbtns"><button class="btn primary" onclick="doAfterBingo()">喝完，继续 →</button></div>`:''}`;
-    return;
-  }
-  if(!myTurn){
-    el.innerHTML=`<div class="not-your-turn">⏳ 轮到 <strong>${curName}</strong> 操作...</div>`;
-    return;
-  }
-  if(phase==='select'){el.innerHTML=`<div class="prompt"><strong>你的回合</strong>，请选一个格子</div>`;return;}
-  if(selCell<0||selCell>=cells.length){el.innerHTML=`<div class="prompt">请选格子</div>`;return;}
-  const cell=cells[selCell];const t=topCard(cell.stack);const isBombTop=t.type==='bomb';
-  if(phase==='guess'){
-    el.innerHTML=`<div class="prompt">${isBombTop?`格子是 <span class="bl">💣炸弹</span>！猜下一张（输了双倍）`:`当前牌 <strong>${t.rank}${t.suit}</strong> — 猜下一张`}</div>
-      <div class="gbtns"><button class="gbtn" onclick="doGuess('big')">↑ 大</button><button class="gbtn" onclick="doGuess('small')">↓ 小</button></div>`;
-  } else if(phase==='win'){
-    el.innerHTML=`<div class="banner win">✅ 猜对了！翻出 ${cardLabel(lastRes.newCard)}</div>
-      <div class="prompt">继续选格子，还是 pass？</div>
-      <div class="cbtns"><button class="btn primary" onclick="doContinue()">继续选格 →</button><button class="btn" onclick="doPass()">Pass 给下家</button></div>`;
-  } else if(phase==='lose'){
-    let bc='lose',ex='';
-    if(lastRes.dragon&&lastRes.doubled){bc='dragon';ex='🐉 龙门框+💣 x4！ ';}
-    else if(lastRes.dragon){bc='dragon';ex='🐉 中龙门框！x2 ';}
-    else if(lastRes.doubled){bc='bomb-lose';ex='💣 炸弹双倍！';}
-    el.innerHTML=`<div class="banner ${bc}">❌ 翻出 ${cardLabel(lastRes.newCard)} — ${ex}喝 ${lastRes.sips} 口 🍺</div>
-      <div class="prompt">喝完继续猜这格。</div>
-      <div class="cbtns"><button class="btn primary" onclick="doLoseContinue()">喝完，继续猜 →</button></div>`;
-  }
-}
-
-function renderLB(players){
+function renderLB_local(){
   const el=document.getElementById('lb');
-  const arr=Object.values(players).sort((a,b)=>(b.sips||0)-(a.sips||0));
-  const max=arr[0]?.sips||0;
+  const sorted=[...localPlayers].sort((a,b)=>b.sips-a.sips);
+  const max=sorted[0]?.sips||0;
   if(!max){el.innerHTML=`<div class="lb-empty">还没有人喝酒</div>`;return;}
-  el.innerHTML=arr.map((p,i)=>{
-    const barW=max?Math.round(((p.sips||0)/max)*100):0;
+  el.innerHTML=sorted.map((p,i)=>{
+    const barW=max?Math.round((p.sips/max)*100):0;
     return `<div class="lb-row ${i===0?'rank1':''}">
       <span class="lb-medal">${i<3?MEDALS[i]:i+1}</span>
-      <span class="lb-name">${p.name}${p.id===myId?' ★':''}</span>
+      <span class="lb-name">${p.name}</span>
       <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barW}%"></div></div>
-      <span class="lb-sips">🍺 ${p.sips||0}</span>
+      <span class="lb-sips">🍺 ${p.sips}</span>
     </div>`;
   }).join('');
 }
-
-// ─── Game actions (only current player can call) ───────────
-window.cellClick=async function(i){
-  const snap=await get(roomRef);const room=snap.val();
-  if(room.curPlayer!==myId||room.phase!=='select')return;
-  await update(roomRef,{selCell:i,phase:'guess'});
-};
-
-window.doGuess=async function(guess){
-  const snap=await get(roomRef);const room=snap.val();
-  if(room.curPlayer!==myId||room.phase!=='guess')return;
-  const cells=JSON.parse(room.cells);
-  const players=room.players||{};
-  const mode=room.mode||'normal';
-  const si=room.selCell;
-  const cell=cells[si];
-  const curr=topCard(cell.stack);
-
-  // Draw from cell's deck
-  if(!cell.deck||!cell.deck.length){cell.deck=buildDeck();}
+function renderPanel_local(){
+  const el=document.getElementById('panel');
+  const p=localPlayers[localCurIdx];
+  if(localPhase==='bingo'&&localLastRes){
+    el.innerHTML=`<div class="banner bingo">🎰 BINGO！${p.name} 喝 ${localLastRes.bingoSips} 口 🍺</div>
+      <div class="prompt">喝完再继续！</div>
+      <div class="cbtns"><button class="btn primary" onclick="localAfterBingo()">喝完，继续 →</button></div>`;
+    return;
+  }
+  if(localPhase==='select'){el.innerHTML=`<div class="prompt"><strong>${p.name}</strong>，请选一个格子</div>`;return;}
+  if(localSelCell<0)return;
+  const cell=localCells[localSelCell];const t=topCard(cell.stack);const isBombTop=t.type==='bomb';
+  if(localPhase==='guess'){
+    el.innerHTML=`<div class="prompt">${isBombTop?`格子是 <span class="bl">💣炸弹</span>！猜下一张（输了双倍）`:`当前牌 <strong>${t.rank}${t.suit}</strong> — 猜下一张`}</div>
+      <div class="gbtns"><button class="gbtn" onclick="localGuess('big')">↑ 大</button><button class="gbtn" onclick="localGuess('small')">↓ 小</button></div>`;
+  } else if(localPhase==='win'){
+    el.innerHTML=`<div class="banner win">✅ 猜对了！翻出 ${cardLabel(localLastRes.newCard)}</div>
+      <div class="prompt">继续选格子，还是 pass？</div>
+      <div class="cbtns"><button class="btn primary" onclick="localContinue()">继续选格 →</button><button class="btn" onclick="localPass()">Pass 给下家</button></div>`;
+  } else if(localPhase==='lose'){
+    let bc='lose',ex='';
+    if(localLastRes.dragon&&localLastRes.doubled){bc='dragon';ex='🐉 龙门框+💣 x4！ ';}
+    else if(localLastRes.dragon){bc='dragon';ex='🐉 中龙门框！x2 ';}
+    else if(localLastRes.doubled){bc='bomb-lose';ex='💣 炸弹双倍！';}
+    el.innerHTML=`<div class="banner ${bc}">❌ 翻出 ${cardLabel(localLastRes.newCard)} — ${ex}${p.name} 喝 ${localLastRes.sips} 口 🍺</div>
+      <div class="prompt">喝完继续猜这格。</div>
+      <div class="cbtns"><button class="btn primary" onclick="localLoseContinue()">喝完，继续猜 →</button></div>`;
+  }
+}
+window.localCellClick=function(i){if(localPhase!=='select')return;localSelCell=i;localPhase='guess';renderGrid_local();renderPanel_local();};
+window.localGuess=function(guess){
+  const cell=localCells[localSelCell];const curr=topCard(cell.stack);
+  if(!cell.deck||!cell.deck.length)cell.deck=buildDeck();
   const newCard=cell.deck.pop();
   let correct=false,dragon=false;
-  if(newCard.type==='bomb'){correct=false;}
+  if(newCard.type==='bomb')correct=false;
   else if(curr.type==='bomb'){
     const normals=cell.stack.filter(c=>c.type==='normal');
     if(normals.length>=1){const prev=normals[normals.length-1];
@@ -518,118 +473,342 @@ window.doGuess=async function(guess){
     else correct=(guess==='big'&&VAL[newCard.rank]>VAL[curr.rank])||(guess==='small'&&VAL[newCard.rank]<VAL[curr.rank]);
   }
   cell.stack.push(newCard);
-
   if(correct){
-    // Check bingo
-    if(mode==='hell'){
-      let bingoLine=null;
-      for(const line of BINGO_LINES){
-        const tops=line.map(i=>topCard(cells[i].stack));
-        if(tops.every(t=>t.type==='normal')&&tops[0].rank===tops[1].rank&&tops[1].rank===tops[2].rank){bingoLine=line;break;}
-      }
-      if(bingoLine){
-        const bingoSips=bingoLine.reduce((s,i)=>s+cells[i].stack.length,0);
-        const updPlayers={...players};
-        updPlayers[myId]={...updPlayers[myId],sips:(updPlayers[myId].sips||0)+bingoSips};
-        await update(roomRef,{
-          cells:JSON.stringify(cells),
-          players:updPlayers,
-          phase:'bingo',
-          bingoLine:JSON.stringify(bingoLine),
-          lastRes:JSON.stringify({newCard,bingoSips})
-        });
-        return;
-      }
+    if(localMode==='hell'){const bl=checkBingo(localCells);if(bl){const bs=bl.reduce((s,i)=>s+localCells[i].stack.length,0);localPlayers[localCurIdx].sips+=bs;localLastRes={newCard,bingoLine:bl,bingoSips:bs};localPhase='bingo';renderGrid_local(bl);renderGamePlayers_local();renderLB_local();renderPanel_local();return;}}
+    localLastRes={newCard};localPhase='win';
+  } else {
+    const doubled=hasBomb(cell.stack);let sips=cell.stack.length;
+    if(dragon)sips*=2;if(doubled)sips*=2;
+    localPlayers[localCurIdx].sips+=sips;localLastRes={newCard,sips,doubled,dragon};localPhase='lose';
+  }
+  renderGrid_local();renderGamePlayers_local();renderLB_local();renderPanel_local();
+};
+window.localContinue=function(){localSelCell=-1;localPhase='select';renderGrid_local();renderPanel_local();};
+window.localPass=function(){localCurIdx=(localCurIdx+1)%localPlayers.length;localSelCell=-1;localPhase='select';localLastRes=null;renderLocalGame();};
+window.localLoseContinue=function(){
+  const cell=localCells[localSelCell];if(!cell.deck||!cell.deck.length)cell.deck=buildDeck();
+  let card=null;while(!card){const c=cell.deck.pop();if(c.type==='normal')card=c;else cell.deck.unshift(c);}
+  cell.stack=[card];renderGrid_local();localPhase='guess';renderPanel_local();
+};
+window.localAfterBingo=function(){
+  localLastRes.bingoLine.forEach(i=>{const cell=localCells[i];if(!cell.deck||!cell.deck.length)cell.deck=buildDeck();let card=null;while(!card){const c=cell.deck.pop();if(c.type==='normal')card=c;else cell.deck.unshift(c);}cell.stack=[card];});
+  localSelCell=-1;localPhase='select';renderGrid_local();renderPanel_local();
+};
+window.leaveGame=function(){
+  if(isOnline){leaveRoom();}else{localPlayers=[];localCurIdx=0;showScreen('screen-home');}
+};
+
+// ══════════════════════════════════════════════════════════
+// ONLINE MODE
+// ══════════════════════════════════════════════════════════
+window.goCreate=async function(){
+  const name=document.getElementById('my-name').value.trim();
+  if(!name){showWarn('home-warn','请输入你的名字');return;}
+  myName=name;myId=Date.now().toString();isHost=true;isOnline=true;
+  roomCode=genCode();
+  roomRef=ref(db,`rooms/${roomCode}`);
+  await set(roomRef,{host:myId,status:'lobby',mode:'normal',players:{[myId]:{name,sips:0,id:myId,rejoined:false}},cells:null,curPlayer:null,phase:'select',selCell:-1,lastRes:null});
+  document.getElementById('lobby-code').textContent=roomCode;
+  listenRoom();showScreen('screen-lobby');
+};
+
+window.goJoin=async function(){
+  const name=document.getElementById('my-name').value.trim();
+  const code=document.getElementById('join-code').value.trim().toUpperCase();
+  if(code.length!==4){showWarn('home-warn','请输入4位房间码');return;}
+  roomCode=code;roomRef=ref(db,`rooms/${roomCode}`);
+  const snap=await get(roomRef);
+  if(!snap.exists()){showWarn('home-warn','房间不存在，请检查房间码');return;}
+  const room=snap.val();
+  const existingPlayers=Object.values(room.players||{});
+  // If room is playing or has players, show rejoin screen
+  if(existingPlayers.length>0){
+    renderRejoinScreen(existingPlayers,room.status);
+    showScreen('screen-rejoin');
+    return;
+  }
+  // Brand new join
+  if(!name){showWarn('home-warn','请输入你的名字');return;}
+  await doJoinNew(name,room);
+};
+
+function renderRejoinScreen(players,status){
+  const el=document.getElementById('rejoin-list');
+  el.innerHTML=players.map((p,i)=>`
+    <div class="rejoin-item">
+      <span class="rejoin-name">${p.name}</span>
+      <span class="rejoin-sips">🍺${p.sips||0}口</span>
+      <button class="rejoin-btn" onclick="doRejoin('${p.id}','${p.name}')">继续</button>
+    </div>`).join('');
+}
+
+window.doRejoin=async function(oldId,oldName){
+  myId=Date.now().toString();myName=oldName;isHost=false;isOnline=true;
+  // Update the player's id to new session id, mark as rejoined
+  const snap=await get(roomRef);const room=snap.val();
+  const players=room.players||{};
+  const oldPlayer=players[oldId];
+  if(!oldPlayer){showWarn('rejoin-warn','找不到该玩家，请重试');return;}
+  // Copy old player data to new id, remove old
+  const updatedPlayers={...players};
+  updatedPlayers[myId]={...oldPlayer,id:myId,rejoined:true};
+  delete updatedPlayers[oldId];
+  // Also update curPlayer if it was this player
+  const updates={[`rooms/${roomCode}/players`]:updatedPlayers};
+  if(room.curPlayer===oldId)updates[`rooms/${roomCode}/curPlayer`]=myId;
+  await update(ref(db),updates);
+  document.getElementById('waiting-code').textContent=roomCode;
+  listenRoom();
+  if(room.status==='playing'){showScreen('screen-game');}
+  else{showScreen('screen-waiting');}
+};
+
+window.joinAsNew=async function(){
+  const name=document.getElementById('rejoin-new-name').value.trim();
+  if(!name){showWarn('rejoin-warn','请输入你的名字');return;}
+  const snap=await get(roomRef);const room=snap.val();
+  if(room.status==='playing'){showWarn('rejoin-warn','游戏已经开始，请选择继续选项');return;}
+  await doJoinNew(name,room);
+};
+
+async function doJoinNew(name,room){
+  myName=name;myId=Date.now().toString();isHost=false;isOnline=true;
+  await update(ref(db,`rooms/${roomCode}/players/${myId}`),{name,sips:0,id:myId,rejoined:false});
+  document.getElementById('waiting-code').textContent=roomCode;
+  listenRoom();showScreen('screen-waiting');
+}
+
+function listenRoom(){
+  stopListener();
+  activeListener=onValue(roomRef,snap=>{
+    if(!snap.exists()){leaveRoomClean();return;}
+    const room=snap.val();
+    const players=room.players||{};
+    if(room.status==='lobby'){
+      if(isHost){renderLobbyPlayers(players);showScreen('screen-lobby');}
+      else{renderWaitingPlayers(players);showScreen('screen-waiting');}
+    } else if(room.status==='playing'){
+      document.getElementById('btn-qr').style.display='block';
+      setupGameUI(room.mode||'normal');
+      showScreen('screen-game');
+      renderOnlineGame(room);
     }
+  });
+}
+
+function renderLobbyPlayers(players){
+  const arr=Object.values(players);
+  document.getElementById('player-count').textContent=`(${arr.length}/10)`;
+  const el=document.getElementById('lobby-players');
+  el.innerHTML=arr.length?arr.map((p,i)=>`
+    <div class="player-item">
+      <span class="pidx">${i+1}.</span>
+      <span class="pname">${p.name}${p.id===myId?' (你)':''}${p.rejoined?` <span style="font-size:11px;color:#22c55e;">[继续]</span>`:''}</span>
+    </div>`).join(''):`<div class="empty-hint">等待玩家加入...</div>`;
+  const ok=arr.length>=2;
+  document.getElementById('lobby-normal').classList.toggle('disabled',!ok);
+  document.getElementById('lobby-hell').classList.toggle('disabled',!ok);
+}
+
+function renderWaitingPlayers(players){
+  document.getElementById('waiting-players').innerHTML=Object.values(players).map((p,i)=>`
+    <div class="player-item">
+      <span class="pidx">${i+1}.</span>
+      <span class="pname">${p.name}${p.id===myId?' (你)':''}${p.rejoined?` <span style="font-size:11px;color:#22c55e;">[继续]</span>`:''}</span>
+    </div>`).join('');
+}
+
+window.startGame=async function(mode){
+  const snap=await get(ref(db,`rooms/${roomCode}/players`));
+  const players=snap.val()||{};
+  const arr=Object.values(players);
+  if(arr.length<2){showWarn('lobby-warn','至少需要2名玩家');return;}
+  const cells=makeBoard();
+  await update(roomRef,{status:'playing',mode,cells:JSON.stringify(cells),curPlayer:arr[0].id,phase:'select',selCell:-1,lastRes:null,bingoLine:null});
+};
+
+function renderOnlineGame(room){
+  if(!room.cells)return;
+  const cells=JSON.parse(room.cells);
+  const players=room.players||{};
+  const curPlayer=room.curPlayer;
+  const phase=room.phase||'select';
+  const selCell=room.selCell!=null?room.selCell:-1;
+  const lastRes=room.lastRes?JSON.parse(room.lastRes):null;
+  const bingoLine=room.bingoLine?JSON.parse(room.bingoLine):null;
+  renderGamePlayers_online(players,curPlayer);
+  renderGrid_online(cells,phase,selCell,curPlayer,bingoLine);
+  renderLB_online(players);
+  renderPanel_online(players,curPlayer,phase,cells,selCell,lastRes,room.mode||'normal',bingoLine);
+}
+
+function renderGamePlayers_online(players,curPlayer){
+  document.getElementById('game-pbar').innerHTML=Object.values(players).map(p=>`
+    <div class="pchip ${p.id===curPlayer?'active':''} ${p.id===myId?'me':''}">
+      <span>${p.name}${p.id===myId?' ★':''}${p.rejoined?`<span class="rejoined">继续</span>`:''}</span>
+      <span class="sips">🍺${p.sips||0}</span>
+    </div>`).join('');
+}
+
+function renderGrid_online(cells,phase,selCell,curPlayer,bingoLine){
+  const myTurn=curPlayer===myId;
+  document.getElementById('grid').innerHTML=cells.map((c,i)=>{
+    const t=topCard(c.stack);const isBombTop=t.type==='bomb';
+    const locked=!myTurn||(phase!=='select'&&selCell!==i);
+    const sel=selCell===i?'selected':'';const lock=locked?'locked':'';
+    const bombClass=isBombTop?'is-bomb':'';const bingoClass=bingoLine&&bingoLine.includes(i)?'bingo-hit':'';
+    const badge=c.stack.length>1?`<div class="sbadge">x${c.stack.length}</div>`:'';
+    const dbl=hasBomb(c.stack)&&!isBombTop?`<div class="dbadge">💣x2</div>`:'';
+    let inner='';
+    if(isBombTop)inner=`${badge}${dbl}<span class="bomb-icon">💣</span>`;
+    else{const cc=isRed(t.suit)?'red-s':'blk-s';inner=`${badge}${dbl}<div class="rank ${cc}">${t.rank}</div><div class="suit ${cc}">${t.suit}</div>`;}
+    return `<div class="cell ${sel} ${lock} ${bombClass} ${bingoClass}" onclick="onlineCellClick(${i})">${inner}</div>`;
+  }).join('');
+}
+
+function renderLB_online(players){
+  const el=document.getElementById('lb');
+  const arr=Object.values(players).sort((a,b)=>(b.sips||0)-(a.sips||0));
+  const max=arr[0]?.sips||0;
+  if(!max){el.innerHTML=`<div class="lb-empty">还没有人喝酒</div>`;return;}
+  el.innerHTML=arr.map((p,i)=>{
+    const barW=max?Math.round(((p.sips||0)/max)*100):0;
+    return `<div class="lb-row ${i===0?'rank1':''}">
+      <span class="lb-medal">${i<3?MEDALS[i]:i+1}</span>
+      <span class="lb-name">${p.name}${p.id===myId?' ★':''}${p.rejoined?` <span style="font-size:11px;color:#22c55e;">[继续]</span>`:''}</span>
+      <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barW}%"></div></div>
+      <span class="lb-sips">🍺 ${p.sips||0}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderPanel_online(players,curPlayer,phase,cells,selCell,lastRes,mode,bingoLine){
+  const el=document.getElementById('panel');
+  const myTurn=curPlayer===myId;
+  const curName=(Object.values(players).find(p=>p.id===curPlayer)||{}).name||'?';
+  if(phase==='bingo'&&lastRes){
+    el.innerHTML=`<div class="banner bingo">🎰 BINGO！${curName} 喝 ${lastRes.bingoSips} 口 🍺</div>
+      <div class="prompt">喝完再继续！</div>
+      ${myTurn?`<div class="cbtns"><button class="btn primary" onclick="onlineAfterBingo()">喝完，继续 →</button></div>`:''}`;return;
+  }
+  if(!myTurn){el.innerHTML=`<div class="not-your-turn">⏳ 轮到 <strong>${curName}</strong> 操作...</div>`;return;}
+  if(phase==='select'){el.innerHTML=`<div class="prompt"><strong>你的回合</strong>，请选一个格子</div>`;return;}
+  if(selCell<0)return;
+  const cell=cells[selCell];const t=topCard(cell.stack);const isBombTop=t.type==='bomb';
+  if(phase==='guess'){
+    el.innerHTML=`<div class="prompt">${isBombTop?`格子是 <span class="bl">💣炸弹</span>！猜下一张（输了双倍）`:`当前牌 <strong>${t.rank}${t.suit}</strong> — 猜下一张`}</div>
+      <div class="gbtns"><button class="gbtn" onclick="onlineGuess('big')">↑ 大</button><button class="gbtn" onclick="onlineGuess('small')">↓ 小</button></div>`;
+  } else if(phase==='win'){
+    el.innerHTML=`<div class="banner win">✅ 猜对了！翻出 ${cardLabel(lastRes.newCard)}</div>
+      <div class="prompt">继续选格子，还是 pass？</div>
+      <div class="cbtns"><button class="btn primary" onclick="onlineContinue()">继续选格 →</button><button class="btn" onclick="onlinePass()">Pass 给下家</button></div>`;
+  } else if(phase==='lose'){
+    let bc='lose',ex='';
+    if(lastRes.dragon&&lastRes.doubled){bc='dragon';ex='🐉 龙门框+💣 x4！ ';}
+    else if(lastRes.dragon){bc='dragon';ex='🐉 中龙门框！x2 ';}
+    else if(lastRes.doubled){bc='bomb-lose';ex='💣 炸弹双倍！';}
+    el.innerHTML=`<div class="banner ${bc}">❌ 翻出 ${cardLabel(lastRes.newCard)} — ${ex}喝 ${lastRes.sips} 口 🍺</div>
+      <div class="prompt">喝完继续猜这格。</div>
+      <div class="cbtns"><button class="btn primary" onclick="onlineLoseContinue()">喝完，继续猜 →</button></div>`;
+  }
+}
+
+function setupGameUI(mode){
+  document.getElementById('game-mode-label').textContent=mode==='hell'?'🔥 地狱玩法':'🍺 普通玩法';
+  document.getElementById('game-hell-banner').style.display=mode==='hell'?'block':'none';
+  document.getElementById('game-hint').innerHTML=mode==='hell'
+    ?'A=1最小 · K=13最大 · <span class="dragon">同号=龙门框×2</span> · <span class="bl">💣×2</span> · <span class="bingo">三格同号=BINGO全喝</span>'
+    :'A=1最小 · K=13最大 · <span class="dragon">同号=龙门框×2</span> · 猜错继续 · <span class="bl">💣炸弹×2</span>';
+}
+
+// Online actions
+window.onlineCellClick=async function(i){
+  const snap=await get(roomRef);const room=snap.val();
+  if(room.curPlayer!==myId||room.phase!=='select')return;
+  await update(roomRef,{selCell:i,phase:'guess'});
+};
+window.onlineGuess=async function(guess){
+  const snap=await get(roomRef);const room=snap.val();
+  if(room.curPlayer!==myId||room.phase!=='guess')return;
+  const cells=JSON.parse(room.cells);const players=room.players||{};const mode=room.mode||'normal';
+  const si=room.selCell;const cell=cells[si];const curr=topCard(cell.stack);
+  if(!cell.deck||!cell.deck.length)cell.deck=buildDeck();
+  const newCard=cell.deck.pop();
+  let correct=false,dragon=false;
+  if(newCard.type==='bomb')correct=false;
+  else if(curr.type==='bomb'){
+    const normals=cell.stack.filter(c=>c.type==='normal');
+    if(normals.length>=1){const prev=normals[normals.length-1];
+      if(VAL[newCard.rank]===VAL[prev.rank]){correct=false;dragon=true;}
+      else correct=(guess==='big'&&VAL[newCard.rank]>VAL[prev.rank])||(guess==='small'&&VAL[newCard.rank]<VAL[prev.rank]);
+    }
+  } else {
+    if(VAL[newCard.rank]===VAL[curr.rank]){correct=false;dragon=true;}
+    else correct=(guess==='big'&&VAL[newCard.rank]>VAL[curr.rank])||(guess==='small'&&VAL[newCard.rank]<VAL[curr.rank]);
+  }
+  cell.stack.push(newCard);
+  if(correct){
+    if(mode==='hell'){const bl=checkBingo(cells);if(bl){const bs=bl.reduce((s,i)=>s+cells[i].stack.length,0);const up={...players};up[myId]={...up[myId],sips:(up[myId].sips||0)+bs};await update(roomRef,{cells:JSON.stringify(cells),players:up,phase:'bingo',bingoLine:JSON.stringify(bl),lastRes:JSON.stringify({newCard,bingoSips:bs})});return;}}
     await update(roomRef,{cells:JSON.stringify(cells),phase:'win',lastRes:JSON.stringify({newCard})});
   } else {
-    const doubled=hasBomb(cell.stack);
-    let sips=cell.stack.length;
+    const doubled=hasBomb(cell.stack);let sips=cell.stack.length;
     if(dragon)sips*=2;if(doubled)sips*=2;
-    const updPlayers={...players};
-    updPlayers[myId]={...updPlayers[myId],sips:(updPlayers[myId].sips||0)+sips};
-    await update(roomRef,{
-      cells:JSON.stringify(cells),players:updPlayers,
-      phase:'lose',lastRes:JSON.stringify({newCard,sips,doubled,dragon})
-    });
+    const up={...players};up[myId]={...up[myId],sips:(up[myId].sips||0)+sips};
+    await update(roomRef,{cells:JSON.stringify(cells),players:up,phase:'lose',lastRes:JSON.stringify({newCard,sips,doubled,dragon})});
   }
 };
-
-window.doContinue=async function(){
-  await update(roomRef,{selCell:-1,phase:'select'});
-};
-
-window.doPass=async function(){
+window.onlineContinue=async function(){await update(roomRef,{selCell:-1,phase:'select'});};
+window.onlinePass=async function(){
   const snap=await get(roomRef);const room=snap.val();
   const arr=Object.values(room.players||{});
   const idx=arr.findIndex(p=>p.id===myId);
   const next=arr[(idx+1)%arr.length].id;
   await update(roomRef,{curPlayer:next,selCell:-1,phase:'select',lastRes:null});
 };
-
-window.doLoseContinue=async function(){
+window.onlineLoseContinue=async function(){
   const snap=await get(roomRef);const room=snap.val();
   const cells=JSON.parse(room.cells);const si=room.selCell;const cell=cells[si];
-  // Reset cell with normal card
   if(!cell.deck||!cell.deck.length)cell.deck=buildDeck();
-  let card=null;
-  while(!card){const c=cell.deck.pop();if(c.type==='normal')card=c;else cell.deck.unshift(c);}
-  cell.stack=[card];
-  await update(roomRef,{cells:JSON.stringify(cells),phase:'guess',lastRes:null});
+  let card=null;while(!card){const c=cell.deck.pop();if(c.type==='normal')card=c;else cell.deck.unshift(c);}
+  cell.stack=[card];await update(roomRef,{cells:JSON.stringify(cells),phase:'guess',lastRes:null});
 };
-
-window.doAfterBingo=async function(){
+window.onlineAfterBingo=async function(){
   const snap=await get(roomRef);const room=snap.val();
-  const cells=JSON.parse(room.cells);
-  const bl=JSON.parse(room.bingoLine);
-  bl.forEach(i=>{
-    const cell=cells[i];
-    if(!cell.deck||!cell.deck.length)cell.deck=buildDeck();
-    let card=null;
-    while(!card){const c=cell.deck.pop();if(c.type==='normal')card=c;else cell.deck.unshift(c);}
-    cell.stack=[card];
-  });
+  const cells=JSON.parse(room.cells);const bl=JSON.parse(room.bingoLine);
+  bl.forEach(i=>{const cell=cells[i];if(!cell.deck||!cell.deck.length)cell.deck=buildDeck();let card=null;while(!card){const c=cell.deck.pop();if(c.type==='normal')card=c;else cell.deck.unshift(c);}cell.stack=[card];});
   await update(roomRef,{cells:JSON.stringify(cells),selCell:-1,phase:'select',lastRes:null,bingoLine:null});
 };
 
-// ─── Leave ─────────────────────────────────────────────────
-window.leaveRoom=async function(){
-  listeners.forEach(({ref:r,l})=>off(r,l));
-  listeners=[];
+window.leaveRoom=async function(){leaveRoomClean();};
+async function leaveRoomClean(){
+  stopListener();
   if(roomRef){
-    if(isHost){await remove(roomRef);}
-    else{await remove(ref(db,`rooms/${roomCode}/players/${myId}`));}
+    if(isHost)await remove(roomRef);
+    else if(myId)await remove(ref(db,`rooms/${roomCode}/players/${myId}`));
   }
-  roomRef=null;roomCode='';isHost=false;
-  showScreen('home');
-};
+  roomRef=null;roomCode='';isHost=false;myId='';isOnline=false;
+  showScreen('screen-home');
+}
 
-// ─── QR ───────────────────────────────────────────────────
+// QR
 window.showQR=function(){
-  const overlay=document.getElementById('qr-overlay');
-  overlay.classList.add('show');
-  if(!qrGenerated){
-    const baseUrl=window.location.href.split('?')[0];
-    const joinUrl=`${baseUrl}?join=${roomCode}`;
-    document.getElementById('qr-url').textContent=joinUrl;
-    document.getElementById('qr-desc').textContent=`房间码: ${roomCode}`;
-    new QRCode(document.getElementById('qr-canvas'),{
-      text:joinUrl,width:200,height:200,
-      colorDark:'#1a1a1a',colorLight:'#ffffff',
-      correctLevel:QRCode.CorrectLevel.M
-    });
-    qrGenerated=true;
-  }
+  document.getElementById('qr-overlay').classList.add('show');
+  const canvas=document.getElementById('qr-canvas');canvas.innerHTML='';
+  const baseUrl=window.location.href.split('?')[0];
+  const joinUrl=`${baseUrl}?join=${roomCode}`;
+  document.getElementById('qr-url').textContent=joinUrl;
+  document.getElementById('qr-desc').textContent=`房间码：${roomCode}`;
+  new QRCode(canvas,{text:joinUrl,width:200,height:200,colorDark:'#1a1a1a',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
 };
 window.hideQR=function(e){if(e.target===document.getElementById('qr-overlay'))document.getElementById('qr-overlay').classList.remove('show');};
 
-// ─── URL join ─────────────────────────────────────────────
+// URL auto-fill
 const urlParams=new URLSearchParams(window.location.search);
 const joinParam=urlParams.get('join');
-if(joinParam){document.getElementById('join-code').value=joinParam.toUpperCase();}
-
-// ─── Helpers ──────────────────────────────────────────────
-function showWarn(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',3000);}
+if(joinParam){
+  document.getElementById('join-code').value=joinParam.toUpperCase();
+  showScreen('screen-online');
+}
 </script>
 </body>
 </html>
